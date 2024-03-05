@@ -1,0 +1,68 @@
+
+
+// ----------------------------------------------------
+
+
+Author Name  : Abdul Khalid
+Create ON    : 03 - 03 - 2024
+
+// --------------------------------------------------
+
+DROP TABLE IF EXISTS contractors;
+
+CREATE TABLE IF NOT EXISTS contractors (
+    pkContractorId INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    contactPerson VARCHAR(255),
+    cnic VARCHAR(255),
+    phoneNumber VARCHAR(15),
+    address TEXT,
+    registrationDate DATETIME,
+    otherDetails TEXT
+);
+INSERT INTO contractors (name, contactPerson, cnic, phoneNumber, address, registrationDate, otherDetails)
+VALUES
+    ('عمر گروہ', 'کمال عمر', '12345-6789123-4', '0300-1234567', 'لاہور', '2022-03-01 10:30:00', 'کچھ مزید تفصیلات'),
+    ('رحمان بلڈرز', 'عبدالرحمان', '56789-1234567-8', '0312-9876543', 'کراچی', '2022-03-02 12:45:00', 'کچھ مزید تفصیلات'),
+    ('تحفہ انٹرپرائز', 'علی حسین', '98765-4321098-7', '0333-5558888', 'اسلام آباد', '2022-03-03 15:20:00', 'کچھ مزید تفصیلات'),
+    ('سلامت گروہ', 'فاطمہ صدیق', '34567-8901234-5', '0321-1239876', 'پشاور', '2022-03-04 18:10:00', 'کچھ مزید تفصیلات'),
+    ('بنیادی بلڈرز', 'عبدالسلام', '87654-3210987-6', '0345-8765432', 'کوئٹہ', '2022-03-05 21:00:00', 'کچھ مزید تفصیلات');
+
+
+
+
+DROP TABLE IF EXISTS ContractorKhata;
+
+CREATE TABLE IF NOT EXISTS ContractorKhata (
+    pkContractorKhataId INT PRIMARY KEY AUTO_INCREMENT,
+    vehicleRegistrationNo INT,
+    createdOn DATETIME,
+    destinationAddress TEXT,
+    measurement INT,
+    price INT,
+    allowance INT,
+    totalAmount INT,
+    processDescription TEXT,
+    fkContractorId INT,
+    FOREIGN KEY (fkContractorId) REFERENCES contractors (pkContractorId)
+);
+
+INSERT INTO ContractorKhata (
+    vehicleRegistrationNo,
+    createdOn,
+    destinationAddress,
+    measurement,
+    price,
+    allowance,
+    totalAmount,
+    processDescription,
+    fkContractorId
+) VALUES
+    (123, '2022-04-01 10:30:00', 'لہور', 4, 20000, 5000, 20000, 'مثال:  4 x 5000 = 20000', 1),
+    (456, '2022-04-02 12:45:00', 'کراچی', 2, 10000, 3000, 30000, 'مثال:  2 x 5000 = 10000', 2),
+    (789, '2022-04-03 15:20:00', 'اسلام آباد', 3, 15000, 4000, 45000, 'مثال:  3 x 5000 = 15000', 3),
+    (321, '2022-04-04 18:10:00', 'پشاور', 5, 25000, 6000, 70000, ' مثال:  5 x 5000 = 25000', 4),
+    (654, '2022-04-05 21:00:00', 'کوئٹہ', 1, 5000, 1000, 75000, 'مثال:  1 x 5000 = 5000', 5);
+
+
+

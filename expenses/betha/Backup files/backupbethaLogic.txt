@@ -1,0 +1,149 @@
+<?php
+
+// version 1 . 0
+header('Content-Type: application/json');
+
+$rootDirectoryFileSelect = $_SERVER['DOCUMENT_ROOT'] . "/LocalTransportofficeWebsite/";
+include_once $rootDirectoryFileSelect ."/includes/functions.php";
+
+if (isset($_POST['selectedContractorId'])) {
+    $pkContractorId = $_POST['selectedContractorId'];
+    $CrudOperation = new CrudOperation();
+
+    $table = "contractorkhata";
+    $columns = " pkContractorKhataId , vehicleRegistrationNo , createdOn , destinationAddress , measurement	, price , allowance , totalAmount	, processDescription , fkContractorId";
+    $where = " fkContractorId = ". $pkContractorId;
+    $orderBy = " pkContractorKhataId	Desc";
+    $limit = 1;
+
+
+    $formResult = $CrudOperation->readRecords($table, $columns, $where, null, null, $limit, null,$orderBy);
+    if (empty($formResult)) {     
+        $totalAmount = 0;
+    }else{
+        $totalAmount = $formResult[0]['totalAmount'];
+    }
+
+
+
+
+    
+    $contractorBathaForm = '
+                <div class="col-md-6 text-end">
+                    <label for="siteSelection" class="form-label">: سائٹ</label>
+                    <input type="text" class="form-control text-end" id="siteSelection" placeholder="- سائٹ کا انتخاب کریں">
+                </div>
+                <div class="col-md-6 text-end">
+                    <label for="vehicleNumber" class="form-label"> : گاڑی نمبر</label>
+                    <input type="text" class="form-control text-end" id="vehicleNumber" name="vehicleNumber"
+                        placeholder="گاڑی کا نمبر لکھیں">
+                </div>
+                <div class=" col-md-4 text-end">
+                    <label for="calculatedRateNumberOfTotalSankra" class="form-label"> : رقم</label>
+                    <input type="number" class="form-control" id="calculatedRateNumberOfTotalSankra" name="calculatedRateNumberOfTotalSankra" readonly>
+                </div>
+                <div class="col" style="text-align: center;">
+                    <div style="margin-top: 40px;">=</div>
+                </div>
+                <div class="col-md-3 text-end">
+                    <label for="NumberOfSankra" class="form-label">: پیمائش</label>
+                    <input type="number" class="form-control" id="NumberOfSankra" oninput="calculateResult();" name="NumberOfSankra"
+                        placeholder="گاڑی کی پیمائش درج کریں">
+                </div>
+                <div class="col-md-4 text-end">
+                    <label for="ratePerSankra" class="form-label">: ریٹ</label>
+                    <input type="number" class="form-control" id="ratePerSankra" name="ratePerSankra" placeholder="سینکڑا کی قیمت لکھیں"
+                        oninput="calculateResult();">
+                </div>
+                <div class="col-12 text-end">
+                    <label for="thekidarSelection" class="form-label">: قل رقم</label>
+                    
+                    <select id="selectedcontractor" name="selectedcontractor" class="form-select">
+                        <option class="text-end" value='. $totalAmount .' readonly> '. $totalAmount .'</option>
+                    
+                </select>
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary" name="submitcontractorkhata">حساب میں جمع کریں</button>
+                </div>';
+
+    $table = "contractorkhata";
+    $columns = "*";
+    $where = " fkContractorId = ". $pkContractorId;
+    $orderBy = " pkContractorKhataId Desc";
+    $limit = null;
+    $tableResult = $CrudOperation->readRecords($table, $columns, $where, null, null, $limit, null,$orderBy);
+
+    $contractorBathaTable = '
+    <div class="container table-responsive my-3 px-3" id="table-container">
+    <h3 class="text-end mt-5"> ٹھیکیدار کی تمام معلومات یہاں دیکھیں</h3>
+    <div class="bg-body-tertiary px-5 p-2">
+        <div class="container-fluid d-flex justify-content-between align-items-center text-end">
+            <div class="d-flex align-items-center">
+                <label for="NumberoOfRecords" class="me-2"> : ریکارڈز </label>
+                <select id="NumberoOfRecords">
+                    <option selected>10</option>
+                    <option>25</option>
+                    <option>50</option>
+                    <option>100</option>
+                </select>
+            </div>
+            <div>
+                <a class="btn btn-primary me-2" href="#" role="button"> ریکارڈ دیکھیں PDF</a>
+                <a class="btn btn-primary me-2" href="#" role="button"> ریکارڈ دیکھیں Excel</a>
+            </div>
+        </div>
+    </div>
+    <table class="table table-bordered">
+        <thead>
+            <tr class="table-dark">
+                <th scope="col">ٹوٹل رقم</th>
+                <th scope="col">رقم</th>
+                <th scope="col">پیمائش</th>
+                <th scope="col">ریٹ </th>
+                <th scope="col">سائٹ</th>
+                <th scope="col">گاڑی کا نمبر</th>
+                <th scope="col">ٹھیکیدار</th>
+                <th scope="col">تاریخ</th>
+                <th scope="col">سیریل</th>                            
+            </tr>
+        </thead>
+        <tbody class="table-info" >  ';
+        if (empty($tableResult)) {     
+            $contractorBathaTable .= '
+            <tr class="bg-info"><td colspan="9" style="text-align: center;" > No Record Found</td> </tr>
+            ';
+        }else{
+            foreach($tableResult as $value){
+                $contractorBathaTable .= '
+                    <tr  class="bg-info">
+                        <td>'. $value['totalAmount'] .'</td>
+                        <td>'. $value['allowance'] .'</td>
+                        <td>'. $value['measurement'] .'</td>
+                        <td>'. $value['price'] .'</td>
+                        <td>'. $value['destinationAddress'] .'</td>
+                        <td>'. $value['vehicleRegistrationNo'] .'</td>
+                        <td>'. $value['fkContractorId'] .'</td>
+                        <td>'. $value['createdOn'] .'</td>
+                        <td>'. $value['pkContractorKhataId'] .'</td>
+                    </tr>     
+                ';
+            }
+            
+        }          
+
+        $contractorBathaTable .= '
+        </tbody>
+    </table>
+</div>';
+
+    $response = array('table' => $contractorBathaTable, 'form' => $contractorBathaForm);
+    echo json_encode($response);
+} else {
+    echo json_encode("Invalid request.");
+}
+
+
+// version 1 . 1 up cumming
+
+?>
