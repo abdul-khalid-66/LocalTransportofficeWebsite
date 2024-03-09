@@ -63,7 +63,7 @@ echo  $Navbar->getContent();
                 <div class="card-body">
                     <h2 class="card-title amiri-bold">بتہ</h2>
                     <p class="card-text">گاڑی کی بتہ تفصیلات یہاں دیکھیں</p>
-                    <a href="expenses/betha/bethaForm.php">Explor</a>
+                    <a href="expenses/betha/ContractorFormController.php">Explor</a>
                 </div>
             </div>
         </div>
@@ -81,6 +81,6 @@ echo  $Navbar->getContent();
 </div>
 <!-- Cards show courses end -->
 <?php
-$Footer = new Footer();
+$Footer = new Footer($rootDirectoryComponentsSelect);
 echo  $Footer->getContent();
 ?>

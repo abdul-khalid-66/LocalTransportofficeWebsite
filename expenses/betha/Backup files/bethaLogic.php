@@ -1,4 +1,6 @@
 <?php
+
+// All AJAX LOGIC Code I Will Remove it in future 
 header('Content-Type: application/json');
 
 $rootDirectoryFileSelect = $_SERVER['DOCUMENT_ROOT'] . "/LocalTransportofficeWebsite/";
@@ -14,17 +16,12 @@ if (isset($_POST['selectedContractorId'])) {
     $orderBy = " pkContractorKhataId	Desc";
     $limit = 1;
 
-
     $formResult = $CrudOperation->readRecords($table, $columns, $where, null, null, $limit, null,$orderBy);
     if (empty($formResult)) {     
         $totalAmount = 0;
     }else{
         $totalAmount = $formResult[0]['totalAmount'];
     }
-
-
-
-
     
     $contractorBathaForm = '
                 <div class="col-md-6 text-end">

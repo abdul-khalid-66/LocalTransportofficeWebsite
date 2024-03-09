@@ -1,0 +1,154 @@
+
+// GET Form and Table  __DIR__  expenses/betha/bethaForm.php 
+$(document).ready(function () {
+    $('#selectedcontractor').change(function () {
+        var selectedContractorId = $(this).val()
+
+
+        if (selectedContractorId != "NULL") {
+
+            var selectedContractorName = $('#selectedcontractor option:selected').text();
+            var selectedContractorCnic = selectedContractorName.split(' ( ')[1].slice(0, -2);
+
+            $.ajax({
+                url: 'FormTableAjaxController.php',
+                method: 'POST',
+                data: {
+                    selectedContractorId: selectedContractorId,
+                    selectedContractorName: selectedContractorName,
+                    selectedContractorCnic: selectedContractorCnic
+                },
+                dataType: 'json',
+                success: function (response) {
+                    var tableData = response.table;
+                    var formData = response.form;
+                    console.log(formData);
+                    // for (var i = 0; i < formData.length; i++) {
+                    //     console.log(formData[i].allowance),
+                    //         console.log(formData[i].createdOn),
+                    //         console.log(formData[i].destinationAddress),
+                    //         console.log(formData[i].fkContractorId),
+                    //         console.log(formData[i].measurement),
+                    //         console.log(formData[i].pkContractorKhataId),
+                    //         console.log(formData[i].price),
+                    //         console.log(formData[i].processDescription),
+                    //         console.log(formData[i].totalAmount),
+                    //         console.log(formData[i].vehicleRegistrationNo)
+                    // }
+
+
+                    for (var i = 0; i < tableData.length; i++) {
+                        document.getElementById('contractorTotalAmount').innerHTML = tableData[i].totalAmount
+                        document.getElementById('contractorAllowance').innerHTML = tableData[i].allowance
+                        document.getElementById('contractorPrice').innerHTML = tableData[i].price
+                        document.getElementById('contractorMeasurement').innerHTML = tableData[i].measurement
+                        document.getElementById('contractorDestinationAddress').innerHTML = tableData[i].destinationAddress
+                        document.getElementById('contractorMaterial').innerHTML = tableData[i].material
+                        document.getElementById('contractorVehicleRegistrationNo').innerHTML = tableData[i].vehicleRegistrationNo
+                        document.getElementById('contractorContractorname').innerHTML = tableData[i].contractorname
+                        document.getElementById('contractorProcessDescription').innerHTML = tableData[i].processDescription
+                        document.getElementById('contractorCreatedOn').innerHTML = tableData[i].createdOn
+                        document.getElementById('contractorPkContractorKhataId').innerHTML = tableData[i].pkContractorKhataId
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        //     console.log(tableData[i].address),
+                        //         console.log(tableData[i].allowance),
+                        //         console.log(tableData[i].cnic),
+                        //         console.log(tableData[i].contactPerson),
+                        //         console.log(tableData[i].createdOn),
+                        //         console.log(tableData[i].destinationAddress),
+                        //         console.log(tableData[i].fkContractorId),
+                        //         console.log(tableData[i].material),
+                        //         console.log(tableData[i].measurement),
+                        //         console.log(tableData[i].name),
+                        //         console.log(tableData[i].otherDetails),
+                        //         console.log(tableData[i].phoneNumber),
+                        //         console.log(tableData[i].pkContractorId),
+                        //         console.log(tableData[i].pkContractorKhataId),
+                        //         console.log(tableData[i].price),
+                        //         console.log(tableData[i].processDescription),
+                        //         console.log(tableData[i].registrationDate),
+                        //         console.log(tableData[i].totalAmount),
+                        //         console.log(tableData[i].vehicleRegistrationNo)
+                        // }
+                    },
+                    error: function () {
+                        alert('An error occurred while processing your request.');
+                    }
+                });
+
+        } else {
+            $.ajax({
+                url: 'FormTableAjaxController.php',
+                method: 'POST',
+                data: {
+                    removeSelectedRecords: true
+                },
+                dataType: 'json',
+                success: function (response) {
+                    console.log(response);
+                },
+                error: function () {
+                    alert('An error occurred while processing your request.');
+                }
+            });
+        }
+    });
+});
+
+
+// GET ContractorData in Form and Table __DIR__ expenses/betha/bethaForm.php
+
+function calculateResult() {
+    var NumberOfSankra = parseFloat(document.getElementById('NumberOfSankra').value) || 0;
+    var ratePerSankra = parseFloat(document.getElementById('ratePerSankra').value) || 0;
+    if (!isNaN(NumberOfSankra) && !isNaN(ratePerSankra)) {
+        var calculatedRatePerSankraWithNumberOfSankra = NumberOfSankra * ratePerSankra;
+        document.getElementById('allowance').value = calculatedRatePerSankraWithNumberOfSankra;
+    }
+}
+
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+    if (successMessage) {
+        removeQueryString();
+        setTimeout(function () {
+            successMessage.style.display = 'none';
+        }, 5000);
+    } else if (errorMessage) {
+        removeQueryString();
+        setTimeout(function () {
+            errorMessage.style.display = 'none';
+        }, 5000);
+    }
+    function removeQueryString() {
+        const urlWithoutQueryString = window.location.pathname + window.location.search.replace(/\?status=.*/, '');
+        history.replaceState({}, document.title, urlWithoutQueryString);
+    }
+});
+
+
+
+
+
+$(document).ready(function () {
+    $('#selectedcontractor').change(function () {
+        $(this).find('option[value="NULL"]').prop('disabled', true);
+    });
+});
