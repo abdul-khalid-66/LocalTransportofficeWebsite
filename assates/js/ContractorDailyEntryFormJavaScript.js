@@ -1,5 +1,5 @@
 
-// GET ContractorData in Form and Table __DIR__ expenses/betha/ContractorFormController.php
+// GET ContractorData in Form and Table __DIR__ expenses/betha/ContractorDailyEntryForm.php
 
 function calculateResult() {
     var NumberOfSankra = parseFloat(document.getElementById('NumberOfSankra').value) || 0;
@@ -9,8 +9,6 @@ function calculateResult() {
         document.getElementById('allowance').value = calculatedRatePerSankraWithNumberOfSankra;
     }
 }
-
-
 
 
 document.addEventListener('DOMContentLoaded', function () {

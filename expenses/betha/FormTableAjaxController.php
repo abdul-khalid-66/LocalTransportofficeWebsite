@@ -14,14 +14,17 @@ if (isset($_POST['selectedContractorId'])) {
     $pkContractorId = $_POST['selectedContractorId'];
     $CrudOperation = new CrudOperation();
 
-    
-    // Get data by Contractorid from from dropdown 
-    $table = "contractorkhata";
-    $columns = " pkContractorKhataId , vehicleRegistrationNo , createdOn , destinationAddress , measurement	, price , allowance , totalAmount	, processDescription , fkContractorId";
-    $where = " fkContractorId = ". $pkContractorId;
-    $orderBy = " pkContractorKhataId	Desc";
+    $table = "Contractors";
+    $columns = "contractorkhata.vehicleRegistrationNo ,contractorkhata.createdOn ,contractorkhata.destinationAddress ,contractorkhata.material ,contractorkhata.measurement ,contractorkhata.price ,contractorkhata.allowance ,contractorkhata.processDescription ,contractorkhata.fkContractorId ,contractorspayments.OldAmount ,contractorspayments.paymentAmount ,contractorspayments.cash ,contractorspayments.loan ,contractorspayments.diseal ,contractorspayments.newAmount ,contractorspayments.processDescription ,contractorspayments.dealer ";
+    $where = " Contractors.pkContractorId = ". $pkContractorId;
+    $join = "  pkContractorKhataId Desc";
+    $join = "   join contractorkhata on contractorkhata.fkContractorId = Contractors.pkContractorId
+                Join contractorspayments on contractorspayments.fkContractorId = Contractors.pkContractorId
+                ";
+    $orderBy = " contractorspayments.pkcontractorspaymentsId Desc";
     $limit = 1;
-    $formResult = $CrudOperation->readRecords($table, $columns, $where, null, null, $limit, null,$orderBy);
+    $formResult = $CrudOperation->readRecords($table, $columns, $where, null, $join, $limit, null,null,$orderBy);
+
 
     
     $table = "contractorkhata";
@@ -30,7 +33,7 @@ if (isset($_POST['selectedContractorId'])) {
     $orderBy = " pkContractorKhataId Desc";
     $join =  " Join contractors ON fkContractorId = pkContractorId ";
     $limit = null;
-    $tableResult = $CrudOperation->readRecords($table, $columns, $where, null, $join, $limit, null,$orderBy);
+    $tableResult = $CrudOperation->readRecords($table, $columns, $where, null, $join, $limit, null,null,$orderBy);
     $pagination = $CrudOperation->pagination($table, $where, null, $limit);
     
 

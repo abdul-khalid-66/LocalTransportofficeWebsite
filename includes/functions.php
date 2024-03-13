@@ -4,28 +4,25 @@ include_once "dbConnection.php";
 
 class CrudOperation extends DBConnection{
     
-    public function createRecords($table, $data) {
+    public function createRecords($table, $data=array()) {
         $columns = implode(', ', array_keys($data));
         $values = "'" . implode("', '", array_values($data)) . "'";
 
-        print_r($columns);
-
-        
-
-        echo $query = "INSERT INTO $table ($columns) VALUES ($values)";
-        
+        $query = "INSERT INTO $table ($columns) VALUES ($values)";        
         $result = $this->connection->query($query);
-
+        if($result){
+            $this->getLastInsertId();
+            
+        }
         return $result ? true : false;
     }
 
+    public function getLastInsertId() {
+        return $this->connection->insert_id;
+    }
 
-    
-
-
-    function readRecords($table , $columns = '*' , $where = null , $between = null , $join = null , $limit = null, $offset=null, $orderBy = null){
+    function readRecords($table , $columns = '*' , $where = null , $between = null , $join = null , $limit = null, $offset=null,$groupBy = null, $orderBy = null){
         if($this->tableExist($table)){
-
         
             $query = "SELECT $columns FROM $table";
 
@@ -37,6 +34,9 @@ class CrudOperation extends DBConnection{
             }
             if($between != null){
                 $query .= " Between  $between";
+            }
+            if ($groupBy != null) {
+                $query .= " Group BY $groupBy";
             }
             if ($orderBy != null) {
                 $query .= " ORDER BY $orderBy";
@@ -55,80 +55,94 @@ class CrudOperation extends DBConnection{
             if($offset != null){
                 $query .= " offset  $offset";
             }
-            
+            // echo $query;
             $result = $this->connection->query($query);
-
             return ($result) ? $result->fetch_all(MYSQLI_ASSOC) : [];
-
         }
-
-
     }
 
     function pagination($table , $where = null , $join = null , $limit = null){
-    if($this->tableExist($table)){
+        if($this->tableExist($table)){
 
 
-        if($limit != null){
+            if($limit != null){
 
-            $query = "SELECT Count(*) FROM $table";
+                $query = "SELECT Count(*) FROM $table";
 
-                if($join != null){
-                    $query .= " $join ";
-                }  
-                if($where != null){
-                    $query .= " Where  $where";
-                }
-                
-                $result = $this->connection->query($query);
-                
-                $totalRecords = $result->fetch_array();                
-                $totalRecords = $totalRecords[0];
-                $totalPages = ceil($totalRecords / $limit);
+                    if($join != null){  $query .= " $join "; }  
+                    if($where != null){  $query .= " Where  $where"; }
+                    
+                    $result = $this->connection->query($query);
+                    
+                    $totalRecords = $result->fetch_array();                
+                    $totalRecords = $totalRecords[0];
+                    $totalPages = ceil($totalRecords / $limit);
 
-                $url = basename($_SERVER['PHP_SELF']);
-                
-                if (isset($_GET['page'])) {
-                    $page = $_GET['page'];
-                } else {
-                    $page = 1;
-                }
+                    $url = basename($_SERVER['PHP_SELF']);
+                    
+                    if (isset($_GET['page'])) {  $page = $_GET['page'];   } else { $page = 1;  }
 
-                $output ='<nav aria-label="...">
-                    <ul class="pagination">';
-                        $output .= '<li class="page-item disabled">
-                                        <a class="page-link">Previous</a>
-                                    </li>';
-                                if($totalRecords > $limit){
-                                    for($i = 1; $i <= $totalPages; $i++){
-                                        if($i == $page){
-                                            $cls = " active ";
-                                        }else{
-                                            $cls ="";
+                    $output ='<nav aria-label="...">
+                        <ul class="pagination">';
+                            $output .= '<li class="page-item disabled"> <a class="page-link">Previous</a> </li>';
+                                    if($totalRecords > $limit){
+                                        for($i = 1; $i <= $totalPages; $i++){
+                                            if($i == $page){ $cls = " active "; } else {  $cls =""; }
+                                            $output .= '<li class="page-item '.$cls.'" aria-current="page"> <a  class="page-link" href=" '.$url .'?page='.$i.'">'. $i .'</a> </li>';
                                         }
-                                        $output .= '<li class="page-item '.$cls.'" aria-current="page">
-                                                        <a  class="page-link" href=" '.$url .'?page='.$i.'">'. $i .'</a>
-                                                    </li>';
-                                    }
-                            };
-                       
-                        
-                        $output .= '<li class="page-item">
-                                <a class="page-link" href="#">Next</a>
-                                </li>';
-                    $output .= '</ul>
-                </nav>';
+                                    }; 
+                            $output .= '<li class="page-item"> <a class="page-link" href="#">Next</a> </li>';
+                        $output .= '</ul>
+                    </nav>';
 
-                return $output;
-                
+                    return $output;
+                    
+                }
+                    
             }
-                
+    }
+
+    function updateRecords($table, $data = array(), $where = null)
+{
+    if ($this->tableExist($table)) {
+
+        $args = array();
+        foreach ($data as $key => $value) {
+            $args[] = "$key = '$value'";
         }
-    }
+        $query = "UPDATE $table SET " . implode(', ', $args);
 
-    function updateRecords(){
+        if ($where != null) {
+            $query .= " WHERE $where";
+        }
 
+        $result = $this->connection->query($query);
+        return $result ? true : false;
     }
+}
+
+
+
+
+    // function updateRecords($table, $data=array(), $where=null) {
+    //     if($this->tableExist($table)){
+
+    //         $args = array();
+    //         foreach($data as $key => $value){
+    //             $args[] = "$key = '$value'";
+    //         }
+    //         $query = "UPDATE $table set ". implode(', ', $args);
+    //         if($where != null){
+    //             $query .= " Where  $where";
+    //         }
+    //         $result = $this->connection->query($query);
+    //         echo $query ;
+    //         return $result ? "true" : "false";
+    //     }
+    // }
+    
+    
+    
     function deleteRecords(){
 
     }

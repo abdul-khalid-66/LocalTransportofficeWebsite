@@ -27,7 +27,7 @@ echo $Navbar->getContent();
     <div class="container mt-3"
         style="width: 50%; border: 1px solid rgb(36, 36, 36); padding: 40px; border-radius: 5px;box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
         <h3 class="text-end mb-5"> ٹھیکیدار کے کھاتے کا حساب کا فارم</h3>
-        <form class="row g-3" action="bethaFormController.php" method="Post">
+        <form class="row g-3" action="ContractorDailyEntryFormController.php" method="Post">
             <div class="col-12 text-end">
                 <label for="thekidarSelection" class="form-label">: ٹھیکیدار کا نام</label>
                 <?php
@@ -35,6 +35,7 @@ echo $Navbar->getContent();
                 $table = "contractors";
                 $columns = '*';
                 $result = $CrudOperation->readRecords($table, $columns, null, null, null, null, null,null);
+                
             ?>
                 <select id="selectedcontractor" name="selectedcontractorId" class="form-select">
                     <option selected class="text-end" value="NULL">ٹھیکیدار کو منتخب کریں۔</option>
@@ -78,25 +79,25 @@ echo $Navbar->getContent();
                         <option class="text-end pe-1" value=" بجری">بجری</option>
                         <option class="text-end pe-1" value="ریت">ریت</option>
                         <option class="text-end pe-1" value=" دیگر">دیگر</option>
-                        
+
                     </select>
                 </div>
                 <div class=" col-md-4 text-end">
                     <label for="allowance" class="form-label"> : رقم</label>
-                    <input type="number" class="form-control" id="allowance" name="allowance">
+                    <input type="number" class="form-control text-center" id="allowance" name="allowance">
                 </div>
                 <div class="col" style="text-align: center;">
                     <div style="margin-top: 40px;">=</div>
                 </div>
                 <div class="col-md-3 text-end">
                     <label for="NumberOfSankra" class="form-label">: ٹن/پیمائش</label>
-                    <input type="number" class="form-control" id="NumberOfSankra" value="0" oninput="calculateResult();"
-                        name="NumberOfSankra" placeholder="گاڑی کی پیمائش درج کریں">
+                    <input type="number" class="form-control text-center" id="NumberOfSankra" value="0"
+                        oninput="calculateResult();" name="NumberOfSankra" placeholder="گاڑی کی پیمائش درج کریں">
                 </div>
                 <div class="col-md-4 text-end">
                     <label for="ratePerSankra" class="form-label">: ریٹ</label>
-                    <input type="number" class="form-control" id="ratePerSankra" name="ratePerSankra" value="0"
-                        placeholder="سینکڑا کی قیمت لکھیں" oninput="calculateResult();">
+                    <input type="number" class="form-control text-center" id="ratePerSankra" name="ratePerSankra"
+                        value="0" placeholder="سینکڑا کی قیمت لکھیں" oninput="calculateResult();">
                 </div>
                 <div class="col-md-12 text-end">
                     <label for="description" class="text-end">کوئی تفصیل </label>
@@ -106,7 +107,8 @@ echo $Navbar->getContent();
 
                 <div class="col-md-12 text-end">
                     <label for="selectedContractorStoreAmount" class="form-label"> : قل رقم</label>
-                    <input style='font-size:30px;border:none' type="text" class="form-control text-end selectedContractorStoreAmount" id="selectedContractorStoreAmount"
+                    <input style='font-size:30px;border:none' type="text"
+                        class="form-control text-end selectedContractorStoreAmount" id="selectedContractorStoreAmount"
                         name="selectedContractorStoreAmount" value="" readonly>
                 </div>
 
@@ -120,7 +122,6 @@ echo $Navbar->getContent();
 
     <h3 id="heading" class="text-end"></h3>
 
-    <!-- <div id="dataTable"></div> -->
     <h1 class="text-end">تمام ٹھیکیدارو کی فہرست</h1>
 
     <table id="example1" class="table table-striped" style="width:100%">
@@ -143,29 +144,77 @@ echo $Navbar->getContent();
         <tbody>
             <?php
 
-            $table = "contractorkhata";
-            $columns = "*";
-            $where = ' (fkContractorId, createdOn) IN ( SELECT fkContractorId, MAX(createdOn) AS max_createdOn FROM
-            contractorkhata GROUP BY fkContractorId )';
-            $orderBy = " pkContractorKhataId Desc";
-            $join = " Join contractors ON fkContractorId = pkContractorId ";
-            $limit = null;
-            $tableResult = $CrudOperation->readRecords($table, $columns, $where, null, $join , $limit, null,$orderBy);
+                $table = "contractors";
+                $columns = "
+                contractorkhata.vehicleRegistrationNo, 
+                contractorkhata.destinationAddress,
+                contractorkhata.material,
+                contractorkhata.measurement,
+                contractorkhata.price,
+                contractorkhata.allowance,
+                
+                contractorkhata.fkContractorId,
 
-            if (empty($tableResult)) {
+                contractorspayments.createdOn,
+                contractorspayments.processDescription,
+
+                contractorspayments.OldAmount,
+                contractorspayments.paymentAmount,
+                contractorspayments.cash,
+                contractorspayments.loan,
+                contractorspayments.diseal,
+                contractorspayments.newAmount as remainingAmount ,
+                contractorspayments.processDescription AS paymentPremainingAmountrocessDescription,
+                contractorspayments.dealer AS paymentDealer,
+
+                Contractors.pkContractorId as pkContractorId,
+                Contractors.name as name,
+                Contractors.contactPerson as contactPerson,
+                Contractors.cnic as cnic,
+                Contractors.phoneNumber as phoneNumber,
+                Contractors.address as address,
+                Contractors.registrationDate as registrationDate,
+                Contractors.otherDetails as otherDetails     
+
+                ";
+
+                $where = '(contractorspayments.fkContractorId, contractorspayments.createdOn) IN (
+                    SELECT 
+                        fkContractorId,
+                        MAX(createdOn) AS maxCreatedOn
+                    FROM 
+                        contractorspayments
+                    GROUP BY 
+                        fkContractorId
+                )
+                ';
+                $orderBy = " contractorspayments.createdOn DESC";
+                $join = " JOIN contractorspayments ON Contractors.pkContractorId = contractorspayments.fkContractorId LEFT JOIN contractorkhata ON contractorkhata.fkContractorId = contractors.pkContractorId AND contractorkhata.pkContractorKhataId = contractorspayments.fkContractorKhataId ";
+                $limit = null;
+                $groupBy = null;
+
+
+                $tableResult = $CrudOperation->readRecords($table, $columns, $where, null, $join , $limit, null,$groupBy,$orderBy);
+
+                // echo "<pre>";
+                // print_r($tableResult);
+                // echo "</pre>";
+
+                if (empty($tableResult)) {
                     echo'
                         <tr>
-                            <td style="text-align: center;"> </td>
-                            <td style="text-align: center;"> </td>
-                            <td style="text-align: center;"> </td>
-                            <td style="text-align: center;"> </td>
-                            <td style="text-align: center;"> </td>
+                            <td style="text-align: center;"> . </td>
+                            <td style="text-align: center;"> . </td>
+                            <td style="text-align: center;"> . </td>
+                            <td style="text-align: center;"> . </td>
+                            <td style="text-align: center;"> . </td>
                             <td style="text-align: center;"> No Record Found</td>
-                            <td style="text-align: center;"> </td>
-                            <td style="text-align: center;"> </td>
-                            <td style="text-align: center;"> </td>
-                            <td style="text-align: center;"> </td>
-                            <td style="text-align: center;"> </td>
+                            <td style="text-align: center;"> . </td>
+                            <td style="text-align: center;"> . </td>
+                            <td style="text-align: center;"> . </td>
+                            <td style="text-align: center;"> . </td>
+                            <td style="text-align: center;"> . </td>
+                            <td style="text-align: center;"> . </td>
                         </tr>
                     ';
                     }else{
@@ -176,32 +225,67 @@ echo $Navbar->getContent();
                     
                     $encryptedContractorId = base64_encode($value['pkContractorId']);
                     $url = 'ContractorsTablesController.php?ContractorId=' . urlencode($encryptedContractorId);
-                    
-                    echo '
-                    <tr>
+                    if($value['vehicleRegistrationNo'] != null AND $value['material'] != null AND $value['measurement'] != null){
+                        echo '
+                        <tr style="font-weight: bolder;">
                         <td id="contractorTotalAmount" class="text-end" >
-                        <a class="btn btn-primary btn-sm" href="'. $url .'" role="button" aria-expanded="false" aria-controls="collapseExample">
-                        دیکھیں 
-                        </a>
-                        </td>
-                        <td id="contractorTotalAmount" class="text-end" >'. $value['totalAmount'] .'</td>
-                        <td id="contractorAllowance" class="text-end" >'. $value['allowance'] .'</td>
-                        <td id="contractorPrice" class="text-end" >'. $value['price'] .'</td>
-                        <td id="contractorMeasurement" class="text-end" >'. $value['measurement'] .'</td>
-                        <td id="contractorDestinationAddress" class="text-end" >'. $value['destinationAddress'] .'</td>
-                        <td id="contractorMaterial" class="text-end" >'. $value['material'] .'</td>
-                        <td id="contractorVehicleRegistrationNo" class="text-end" >'. $value['vehicleRegistrationNo'] .'</td>
+                            <a class="btn btn-primary btn-sm" href="'. $url .'" role="button" aria-expanded="false" aria-controls="collapseExample">
+                            دیکھیں 
+                            </a>
+                            </td>
+                        <td id="" class="text-center" style="color:red">'. $value['remainingAmount'] .'</td>
+                        <td id="" class="text-center" >'. $value['OldAmount'] .'</td>
+                        <td id="" class="text-center" >'. $value['price'] .'</td>
+                        <td id="" class="text-center" >'. $value['measurement'] .'</td>
+                        <td id="" class="text-center" >'. $value['destinationAddress'] .'</td>
+                        <td id="" class="text-center" >'. $value['material'] .'</td>
+                        <td id="" class="text-center" >'. $value['vehicleRegistrationNo'] .'</td>
                         <td id="contractorContractorname" class="text-end">'. $value['name'] .'</td>
-
                         <td id="contractorProcessDescription" class="customTooltip text-end" >
                             <div class="customTooltip">' . $processDescription . '
                                 <span class="tooltiptext">' . $value['processDescription'] . '</span>
                             </div>
                         </td>
                         <td id="contractorCreatedOn" class="text-end ">'. $value['createdOn'] .'</td>
-                        <td id="contractorPkContractorKhataId" class="text-end">'. $pkContractorKhataId .'</td>
-                        </tr>
+                        <td id="contractorPkContractorKhataId" class="text-center">'. $pkContractorKhataId .'</td>
+                    </tr>
                         ';
+                    }else {
+
+                        if($value['remainingAmount'] >= 0){
+                            $color = "green";
+                            $remainder ='ٹھیکیدار پر بقایا';
+                        }else{
+                            $color = "red";
+                            $remainder ='ٹھیکیدار کے بقایا';
+                        }
+                        echo '
+                        <tr  style="background-color:'. $color .';"font-weight: bolder;">
+
+                        <td id="contractorTotalAmount" class="text-end" >
+                            <a class="btn btn-primary btn-sm" href="'. $url .'" role="button" aria-expanded="false" aria-controls="collapseExample">
+                            دیکھیں 
+                            </a>
+                        </td>
+                            
+                        <td id="" class="text-center" style="color:white">'. $value['remainingAmount'] .'</td>
+                        <td id="" class="text-center"  style="color:white"><=</td>
+                        <td id="" class="text-center" style="color:white">'. $remainder .'</td>
+                        <td id="" class="text-center" style="color:white">'. $value['paymentAmount'] .'</td>
+                        <td id="" class="text-center" style="color:white">وصول ہوئے</td>
+                        <td id="" class="text-center" style="color:white">'. $value['OldAmount'] .'</td>
+                        <td id="" class="text-center" style="color:white"> پرانا حساب </td>
+                        <td id="contractorContractorname" style="color:white" class="text-end">'. $value['name'] .'</td>
+                        <td id="" class="customTooltip text-end" >
+                            <div class="customTooltip" style="color:white">' . $processDescription . '
+                                <span class="tooltiptext" style="color:white">' . $value['processDescription'] . '</span>
+                            </div>
+                        </td>
+                        <td id="contractorCreatedOn" class="text-end " style="color:white">'. $value['createdOn'] .'</td>
+                        <td id="contractorPkContractorKhataId" class="text-center" style="color:white">'. $pkContractorKhataId .'</td>
+                    </tr>';
+                        
+                        }
                     }
                 }
                 ?>
@@ -228,9 +312,10 @@ echo $Navbar->getContent();
 
 </div>
 
-<script src='<?php echo $rootDirectoryComponentsSelect ."assates/js/bethaFormTableAjax.js" ;?>'></script>
+<script src='<?php echo $rootDirectoryComponentsSelect ."assates/js/main.js" ;?>'></script>
+<script src='<?php echo $rootDirectoryComponentsSelect ."assates/js/ContractorDailyEntryFormJavaScript.js" ;?>'></script>
 <script src='<?php echo $rootDirectoryComponentsSelect ."assates/js/ContractorsTablesAjax.js" ;?>'></script>
-<script src='<?php echo $rootDirectoryComponentsSelect ."assates/js/bethaFormAjax.js" ;?>'></script>
+<script src='<?php echo $rootDirectoryComponentsSelect ."assates/js/ContractorDailyEntryFormAjax.js" ;?>'></script>
 
 
 <?php
@@ -240,7 +325,8 @@ echo $Navbar->getContent();
 ?>
 
 <script>
-    $(document).ready(function () {
-        $("#example1").DataTable();
-    });
+
+    // new DataTable('#example1', {
+    //     order: [[10, 'desc']]
+    // });
 </script>

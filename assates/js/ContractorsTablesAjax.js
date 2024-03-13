@@ -2,11 +2,11 @@ $(document).ready(function () {
     $('#NumberoOfRecords').change(function () {
         var selectedValue = $(this).val();
         $.ajax({
-            url: 'bethaTableAjax.php',
+            url: 'ContractorsTablesAjaxController.php',
             method: 'POST',
             data: { limit: selectedValue },
             success: function (response) {
-
+                console.log(response);
                 var updatedLimit = response;
                 console.log(updatedLimit);
             },
@@ -17,9 +17,6 @@ $(document).ready(function () {
     });
 });
 
-
-
-// datatable jQuery
 $(document).ready(function () {
     $("#example").DataTable();
 });

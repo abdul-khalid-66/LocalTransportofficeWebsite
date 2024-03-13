@@ -53,25 +53,33 @@ echo  $Navbar->getContent();
 
 <!-- Cards show courses start -->
 
-<div class=" m-5">
+<div class=" m-5 text-end">
     <h1 class="amiri-bold" dir="ltr">سروس برائے کاروبار</h1>
 
 
     <div class="row row-cols-1 row-cols-md-3 g-4">
         <div class="col">
-            <div class="card h-100">
+            <div class="card h-100  text-center">
                 <div class="card-body">
-                    <h2 class="card-title amiri-bold">بتہ</h2>
-                    <p class="card-text">گاڑی کی بتہ تفصیلات یہاں دیکھیں</p>
-                    <a href="expenses/betha/ContractorFormController.php">Explor</a>
+                    <h2 class="card-title amiri-bold">ٹھیکیدار متعلق</h2>
+                    <h5 class="card-text amiri-bold">ٹھیکیدار کی معلومات یہاں دیکھیں</h5>
+                    <a href="expenses/betha/ContractorDailyEntryForm.php">Explor</a>
                 </div>
             </div>
         </div>
-        <div class="col">
+        <div class="col text-center">
             <div class="card h-100">
                 <div class="card-body">
-                    <h5 class="card-title">ڈیزل</h5>
-                    <p class="card-text">ڈیزل کی بتہ تفصیلات یہاں دیکھیں</p>
+                    <h2 class="card-title amiri-bold">گاڑیوں سے متعلق</h2>
+                    <h5 class="card-text amiri-bold">گاڑیوں سے متعلق تمام معلومات یہاں دیکھیں</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col text-center">
+            <div class="card h-100 amiri-bold">
+                <div class="card-body">
+                    <h2 class="card-title amiri-bold">ڈیزل</h2>
+                    <h5 class="card-text amiri-bold">ڈیزل کی بتہ تفصیلات یہاں دیکھیں</h5>
                 </div>
             </div>
         </div>

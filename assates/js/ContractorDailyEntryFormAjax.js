@@ -1,5 +1,5 @@
 
-// GET Form and Table  __DIR__  expenses/betha/ContractorFormController.php 
+// GET Form and Table  __DIR__  expenses/betha/ContractorDailyEntryForm.php 
 $(document).ready(function () {
     $('#selectedcontractor').change(function () {
         var selectedContractorId = $(this).val()
@@ -20,18 +20,33 @@ $(document).ready(function () {
                 },
                 dataType: 'json',
                 success: function (response) {
-                    // console.log("LLLLLLLLLLLLLLLLLLLLLlll")selectedContractorStoreAmount
-                    console.log(response.form[0].totalAmount);
-                    $('#table-container').html(response.table);
-                    $('.selectedContractorStoreAmount').val(response.form[0].totalAmount);
-                    $('#pagination-container').html(response.pagination);
+                    console.log("response");
+                    console.log(response);
+                    if (response.form.length > 0) {
+                        if (response.form[0].newAmount != null) {
+                            $('.selectedContractorStoreAmount').val(response.form[0].newAmount);
+                        } else {
+                            $('.selectedContractorStoreAmount').val(0);
+
+                        }
+                    } else {
+                        $('.selectedContractorStoreAmount').val(0);
+                    }
+                    if (response.table != null) {
+                        $('#table-container').html(response.table);
+                    } else {
+                        $('#table-container').html("<h1>table not exist</h1>");
+                    }
+                    // $('#pagination-container').html(response.pagination);
+
                 },
                 error: function () {
-                    alert('An error occurred while processing your request.');
+                    alert('An error occurred while processing your request daily entry.');
                 }
             });
 
-        } else {
+        }
+        else {
             $.ajax({
                 url: 'FormTableAjaxController.php',
                 method: 'POST',
@@ -50,7 +65,7 @@ $(document).ready(function () {
     });
 });
 
-// GET ContractorData in Form and Table __DIR__ expenses/betha/ContractorFormController.php
+// GET ContractorData in Form and Table __DIR__ expenses/betha/ContractorDailyEntryForm.php
 
 function calculateResult() {
     var NumberOfSankra = parseFloat(document.getElementById('NumberOfSankra').value) || 0;
